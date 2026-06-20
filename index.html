@@ -157,6 +157,76 @@
             </div>
           </div>
         </div>
+<!-- NIVEL 4 -->
+<div class="col-lg-8 d-none" id="seccion-nivel4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Nivel 4 - El Núcleo de Procesamiento</h2>
+      
+
+      <button id="btn-iniciar-n4" class="btn btn-primary mb-3">
+        Iniciar procesamiento
+      </button>
+
+      <div id="progreso-n4-wrapper" class="d-none mb-3">
+        <label class="form-label fw-bold">Procesando datos...</label>
+        <div class="progress" style="height:22px;">
+          <div id="barra-n4"
+               class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+               role="progressbar" style="width:0%">0%</div>
+        </div>
+        
+      </div>
+
+      <div id="stats-n4" class="d-none">
+        <div class="card border-success mt-3">
+          <div class="card-header bg-success text-white fw-bold">
+            Estadísticas —  registros procesados
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card border-primary h-100">
+                  <div class="card-header bg-primary text-white">Temperatura (°C)</div>
+                  <div class="card-body">
+                    <table class="table table-sm mb-0">
+                      <tbody>
+                        <tr><th>Promedio</th><td id="n4-temp-prom">--</td></tr>
+                        <tr><th>Máximo</th> <td id="n4-temp-max">--</td></tr>
+                        <tr><th>Mínimo</th> <td id="n4-temp-min">--</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-info h-100">
+                  <div class="card-header bg-info text-white">Humedad (%)</div>
+                  <div class="card-body">
+                    <table class="table table-sm mb-0">
+                      <tbody>
+                        <tr><th>Promedio</th><td id="n4-hum-prom">--</td></tr>
+                        <tr><th>Máximo</th> <td id="n4-hum-max">--</td></tr>
+                        <tr><th>Mínimo</th> <td id="n4-hum-min">--</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 text-end">
+          <button id="btn-avanzar-n5" class="btn btn-success">
+            Avanzar al Nivel 5 →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
 
       </div>
     </div>
