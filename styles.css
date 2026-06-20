@@ -54,3 +54,62 @@ body {
   font-weight: 500;
   border-style: dashed !important;
 }
+
+/* Nivel 5 - El Portal Cuántico */
+.text-indigo {
+  color: #4f46e5;
+}
+
+.border-purple-subtle {
+  border-color: #e9d5ff !important;
+}
+
+.border-purple {
+  border-color: #8b5cf6 !important;
+}
+
+.bg-purple {
+  background-color: #8b5cf6 !important;
+}
+
+.text-purple {
+  color: #8b5cf6 !important;
+}
+
+.btn-purple {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.btn-purple:hover {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.btn-purple:active {
+  transform: translateY(1px);
+}
+
+.btn-purple:disabled {
+  background: #c084fc;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite ease-in-out;
+  display: inline-block;
+}
+
