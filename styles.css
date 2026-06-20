@@ -44,6 +44,32 @@ body {
   font-size: 1.05rem;
 }
 
+.level-nav {
+  display: block;
+}
+
+.level-nav .btn {
+  min-width: 110px;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.level-nav .btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.level-nav .btn.active {
+  background-color: #3b82f6;
+  color: #ffffff;
+  border-color: #3b82f6;
+}
+
+.level-nav .btn:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .card-body h2.h5 {
   font-size: 1.55rem;
   font-weight: 700;

@@ -18,7 +18,7 @@ self.onmessage = function(e) {
     if (h > maxHum)  maxHum  = h;
     if (h < minHum)  minHum  = h;
 
-    if (i % 2000 === 0) {
+    if (i % 500 === 0) {
       self.postMessage({ tipo: 'progreso', porcentaje: Math.round((i / total) * 100) });
     }
   }

@@ -23,11 +23,72 @@ const photoPlaceholder    = document.getElementById('photo-placeholder');
 const cameraErrorEl       = document.getElementById('camera-error');
 const btnAvanzarN4Wrapper = document.getElementById('btn-avanzar-n4-wrapper');
 const btnAvanzarN4        = document.getElementById('btn-avanzar-n4');
+const navNivel1           = document.getElementById('nav-nivel1');
+const navNivel2           = document.getElementById('nav-nivel2');
+const navNivel3           = document.getElementById('nav-nivel3');
+const navNivel4           = document.getElementById('nav-nivel4');
+const navNivel5           = document.getElementById('nav-nivel5');
 
 // Estado
 let level1Completed = false;
 let currentPosition = null;
 let localStream = null;
+let currentLevel = 1;
+let unlockedLevel = 1;
+
+function updateLevelNav() {
+  for (let i = 1; i <= 5; i++) {
+    const btn = document.getElementById(`nav-nivel${i}`);
+    if (!btn) continue;
+
+    if (i <= unlockedLevel) {
+      btn.disabled = false;
+      btn.classList.remove('disabled');
+      btn.setAttribute('aria-disabled', 'false');
+    } else {
+      btn.disabled = true;
+      btn.classList.add('disabled');
+      btn.setAttribute('aria-disabled', 'true');
+    }
+
+    if (i === currentLevel) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'step');
+    } else {
+      btn.classList.remove('active');
+      btn.removeAttribute('aria-current');
+    }
+  }
+}
+
+function showLevel(level) {
+  if (level > unlockedLevel) return;
+  for (let i = 1; i <= 5; i++) {
+    const section = document.getElementById(`seccion-nivel${i}`);
+    if (!section) continue;
+    const isActive = i === level;
+    section.classList.toggle('d-none', !isActive);
+    section.setAttribute('aria-hidden', String(!isActive));
+  }
+  currentLevel = level;
+  updateLevelNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initLevelNav() {
+  [navNivel1, navNivel2, navNivel3, navNivel4, navNivel5].forEach((button, index) => {
+    if (!button) return;
+    button.addEventListener('click', () => {
+      showLevel(index + 1);
+    });
+  });
+}
+
+function unlockLevel(level) {
+  unlockedLevel = Math.max(unlockedLevel, level);
+  updateLevelNav();
+}
+
 
 // Permisos
 function updatePermissionStatus() {
@@ -101,6 +162,7 @@ function requestLocation() {
       btnAvanzarN2Wrapper.classList.remove('d-none');
       mapLatEl.textContent = latitude.toFixed(6);
       mapLngEl.textContent = longitude.toFixed(6);
+      unlockLevel(2);
     },
     (error) => {
       handleLocationError(error);
@@ -112,9 +174,8 @@ function requestLocation() {
 
 // Avanzar Nivel 1 → 2 
 btnAvanzarN2.addEventListener('click', () => {
-  document.getElementById('seccion-nivel1').classList.add('d-none');
-  seccionNivel2.classList.remove('d-none');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  unlockLevel(2);
+  showLevel(2);
 });
 
 // Canvas
@@ -187,6 +248,7 @@ function drawMap() {
   level2MapMessage.innerHTML = '<div class="alert alert-success mt-2">Mapa dibujado y posición marcada. Nivel 2 completado.</div>';
   btnDrawMap.disabled = true;
   btnAvanzarN3Wrapper.classList.remove('d-none');
+  unlockLevel(3);
 }
 
 function showCameraError(text) {
@@ -252,12 +314,12 @@ function capturePhoto() {
   photoPlaceholder.classList.add('d-none');
   btnAvanzarN4Wrapper.classList.remove('d-none');
   showMessage('Foto capturada con éxito. Nivel 3 completado.', 'success');
+  unlockLevel(4);
 }
 
 document.getElementById('btn-avanzar-n3').addEventListener('click', () => {
-  document.getElementById('seccion-nivel2').classList.add('d-none');
-  document.getElementById('seccion-nivel3').classList.remove('d-none');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  unlockLevel(3);
+  showLevel(3);
 });
 
 // Eventos
@@ -271,6 +333,9 @@ btnReset.addEventListener('click', () => {
   currentPosition = null;
   btnGetLocation.disabled = false;
   btnAvanzarN2Wrapper.classList.add('d-none');
+  unlockedLevel = 1;
+  showLevel(1);
+  updateLevelNav();
 });
 btnDrawMap.addEventListener('click', drawMap);
 btnClearMap.addEventListener('click', () => {
@@ -285,15 +350,15 @@ btnCapturePhoto.addEventListener('click', capturePhoto);
 
 // Init 
 updatePermissionStatus();
-
-// Init 
-updatePermissionStatus();
+initLevelNav();
+updateLevelNav();
 // Avanzar Nivel 3 → 4
 document.getElementById('btn-avanzar-n4').addEventListener('click', function () {
   stopCamera();
   document.getElementById('seccion-nivel3').classList.add('d-none');
   document.getElementById('seccion-nivel4').classList.remove('d-none');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  unlockLevel(4);
+  showLevel(4);
 });
 
 // Nivel 4 — procesamiento con Web Worker
@@ -340,14 +405,14 @@ document.getElementById('btn-iniciar-n4').addEventListener('click', function () 
 
       statsDiv.classList.remove('d-none');
       worker.terminate();
+      unlockLevel(5);
     }
   };
 });
 
 document.getElementById('btn-avanzar-n5').addEventListener('click', function () {
-  document.getElementById('seccion-nivel4').classList.add('d-none');
-  document.getElementById('seccion-nivel5').classList.remove('d-none');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  unlockLevel(5);
+  showLevel(5);
 });
 
 // Nivel 5 — Procesamiento de datos cuánticos con Web Worker
