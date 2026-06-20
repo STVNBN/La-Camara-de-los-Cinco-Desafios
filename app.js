@@ -260,15 +260,6 @@ document.getElementById('btn-avanzar-n3').addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-btnStartCamera.addEventListener('click', startCamera);
-btnCapturePhoto.addEventListener('click', capturePhoto);
-btnAvanzarN4.addEventListener('click', () => {
-  stopCamera();
-  document.getElementById('seccion-nivel3').classList.add('d-none');
-  showMessage('Has avanzado al Nivel 4. Felicitaciones por completar el Nivel 3.', 'success');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
 // Eventos
 btnGetLocation.addEventListener('click', requestLocation);
 btnReset.addEventListener('click', () => {
@@ -289,5 +280,71 @@ btnClearMap.addEventListener('click', () => {
   btnAvanzarN3Wrapper.classList.add('d-none');
 });
 
+btnStartCamera.addEventListener('click', startCamera);
+btnCapturePhoto.addEventListener('click', capturePhoto);
+
 // Init 
 updatePermissionStatus();
+
+// Init 
+updatePermissionStatus();
+// Avanzar Nivel 3 → 4
+document.getElementById('btn-avanzar-n4').addEventListener('click', function () {
+  stopCamera();
+  document.getElementById('seccion-nivel3').classList.add('d-none');
+  document.getElementById('seccion-nivel4').classList.remove('d-none');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Nivel 4 — procesamiento con Web Worker
+document.getElementById('btn-iniciar-n4').addEventListener('click', function () {
+  const btn      = document.getElementById('btn-iniciar-n4');
+  const wrapper  = document.getElementById('progreso-n4-wrapper');
+  const barra    = document.getElementById('barra-n4');
+  const statsDiv = document.getElementById('stats-n4');
+
+  btn.disabled = true;
+  wrapper.classList.remove('d-none');
+  statsDiv.classList.add('d-none');
+
+  // Generar 20,000 datos
+  const datos = [];
+  for (let i = 0; i < 20000; i++) {
+    datos.push({
+      temperatura: +(Math.random() * 60 - 10).toFixed(2),  // -10 a 50 °C
+      humedad:     +(Math.random() * 100).toFixed(2),       // 0 a 100 %
+    });
+    }
+
+  const worker = new Worker('worker-nivel4.js');
+  worker.postMessage(datos);
+
+  worker.onmessage = function (e) {
+    const msg = e.data;
+    if (msg.tipo === 'progreso') {
+      barra.style.width = msg.porcentaje + '%';
+      barra.textContent = msg.porcentaje + '%';
+    }
+    if (msg.tipo === 'resultado') {
+      barra.style.width = '100%';
+      barra.textContent = '100%';
+      barra.classList.remove('progress-bar-animated', 'progress-bar-striped');
+      barra.classList.add('bg-success');
+
+      document.getElementById('n4-temp-prom').textContent = msg.temperatura.promedio + ' °C';
+      document.getElementById('n4-temp-max').textContent  = msg.temperatura.maximo   + ' °C';
+      document.getElementById('n4-temp-min').textContent  = msg.temperatura.minimo   + ' °C';
+      document.getElementById('n4-hum-prom').textContent  = msg.humedad.promedio     + ' %';
+      document.getElementById('n4-hum-max').textContent   = msg.humedad.maximo       + ' %';
+      document.getElementById('n4-hum-min').textContent   = msg.humedad.minimo       + ' %';
+
+      statsDiv.classList.remove('d-none');
+      worker.terminate();
+    }
+  };
+});
+
+document.getElementById('btn-avanzar-n5').addEventListener('click', function () {
+  document.getElementById('seccion-nivel4').classList.add('d-none');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
