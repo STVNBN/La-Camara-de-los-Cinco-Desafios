@@ -346,5 +346,130 @@ document.getElementById('btn-iniciar-n4').addEventListener('click', function () 
 
 document.getElementById('btn-avanzar-n5').addEventListener('click', function () {
   document.getElementById('seccion-nivel4').classList.add('d-none');
+  document.getElementById('seccion-nivel5').classList.remove('d-none');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Nivel 5 — Procesamiento de datos cuánticos con Web Worker
+let n5JsonString = null; // Para almacenar en JSON
+
+document.getElementById('btn-iniciar-n5').addEventListener('click', function () {
+  const btnIniciarN5       = document.getElementById('btn-iniciar-n5');
+  const wrapperN5          = document.getElementById('progreso-n5-wrapper');
+  const barraN5            = document.getElementById('barra-n5');
+  const textoPorcentajeN5  = document.getElementById('porcentaje-n5-texto');
+  const statsN5            = document.getElementById('stats-n5');
+
+  btnIniciarN5.disabled = true;
+  wrapperN5.classList.remove('d-none');
+  statsN5.classList.add('d-none');
+
+  // Inicia estado de la barra 
+  barraN5.style.width = '0%';
+  barraN5.textContent = '0%';
+  textoPorcentajeN5.textContent = '0%';
+  barraN5.classList.add('progress-bar-animated', 'progress-bar-striped');
+  barraN5.classList.remove('bg-success');
+  barraN5.classList.add('bg-purple');
+
+  // Para los 250,000 registros simulados
+  // temperatura, humedad y presión
+  const datosN5 = [];
+  const totalRegistros = 250000;
+  for (let i = 0; i < totalRegistros; i++) {
+    // Temperatura: rango de -15 a 45 °C (~25% de negativos)
+    const temp = +(Math.random() * 60 - 15).toFixed(2);
+    // Humedad: rango de -10% a 100% (~9% de negativos)
+    const hum = +(Math.random() * 110 - 10).toFixed(2);
+    // Presión: rango de -200 hPa a 1100 hPa (~15% de negativos)
+    const pres = +(Math.random() * 1300 - 200).toFixed(2);
+
+    datosN5.push({
+      temperatura: temp,
+      humedad: hum,
+      presion: pres
+    });
+  }
+
+  //Transferir los datos al Worker para su procesamiento
+  const workerN5 = new Worker('worker-nivel5.js');
+  workerN5.postMessage(datosN5);
+
+  // Escucha mensajes del Worker
+  workerN5.onmessage = function (e) {
+    const msg = e.data;
+
+    // Actualiza barra de carga mientras trabaja el worker
+    if (msg.tipo === 'progreso') {
+      barraN5.style.width = msg.porcentaje + '%';
+      barraN5.textContent = msg.porcentaje + '%';
+      textoPorcentajeN5.textContent = msg.porcentaje + '%';
+    }
+
+    if (msg.tipo === 'resultado') {
+      // Finalizar barra de carga
+      barraN5.style.width = '100%';
+      barraN5.textContent = '100%';
+      textoPorcentajeN5.textContent = '100%';
+      barraN5.classList.remove('progress-bar-animated', 'progress-bar-striped', 'bg-purple');
+      barraN5.classList.add('bg-success');
+
+      // Guardar el string JSON devuelto por el worker
+      n5JsonString = msg.resultadoJson;
+
+      // Muestra estadisicas
+      document.getElementById('n5-total-regs').textContent = msg.total.toLocaleString('es-ES');
+      document.getElementById('n5-valid-regs').textContent = msg.validos.toLocaleString('es-ES');
+      document.getElementById('n5-filtered-regs').textContent = (msg.total - msg.validos).toLocaleString('es-ES');
+
+      document.getElementById('n5-avg-temp').textContent = msg.promedios.temperatura + ' °C';
+      document.getElementById('n5-avg-hum').textContent = msg.promedios.humedad + ' %';
+      document.getElementById('n5-avg-pres').textContent = msg.promedios.presion + ' hPa';
+
+      // Cargar Top 10 Temperaturas en la lista
+      const topTempsList = document.getElementById('n5-top-temps');
+      topTempsList.innerHTML = '';
+      msg.top10Temperaturas.forEach((val, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center py-1 bg-transparent border-0 border-bottom border-light';
+        li.innerHTML = `
+          <span class="text-secondary fw-medium">Lectura #${idx + 1}</span>
+          <span class="badge bg-danger rounded-pill fw-semibold shadow-sm">${parseFloat(val).toFixed(2)} °C</span>
+        `;
+        topTempsList.appendChild(li);
+      });
+
+      // Cargar Top 10 Presiones en la lista
+      const topPressuresList = document.getElementById('n5-top-pressures');
+      topPressuresList.innerHTML = '';
+      msg.top10Presiones.forEach((val, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center py-1 bg-transparent border-0 border-bottom border-light';
+        li.innerHTML = `
+          <span class="text-secondary fw-medium">Lectura #${idx + 1}</span>
+          <span class="badge bg-primary rounded-pill fw-semibold shadow-sm">${parseFloat(val).toFixed(2)} hPa</span>
+        `;
+        topPressuresList.appendChild(li);
+      });
+
+      // Mostrar el card con las estadísticas
+      statsN5.classList.remove('d-none');
+      workerN5.terminate();
+    }
+  };
+});
+
+// Exportar los resultados a un JSON descargable
+document.getElementById('btn-exportar-n5').addEventListener('click', function () {
+  if (!n5JsonString) return;
+
+  const blob = new Blob([n5JsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'resultados-portal-cuantico.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 });
