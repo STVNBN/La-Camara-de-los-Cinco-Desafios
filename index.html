@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escape Room - Cámara de los cinco desafíos</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container py-5">
+      <div class="page-header text-center mb-4 py-4 px-3 rounded-4 shadow-sm">
+        <h1 class="display-6 mb-2">Escape Room</h1>
+        <p class="lead mb-0">La cámara de los cinco desafíos</p>
+      </div>
+
+      <div class="row justify-content-center gy-4">
+
+        <!-- NIVEL 1 -->
+        <div class="col-lg-8" id="seccion-nivel1">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-3">Nivel 1 - Obtener ubicación</h2>
+              <p>
+                Para acceder a la base de datos de la ciudad inteligente, primero debes demostrar tu ubicación.
+                El sistema necesita verificar tu posición geográfica actual.
+              </p>
+              <div id="permission-status" class="alert alert-info small" role="alert">
+                Comprobando permisos...
+              </div>
+              <div class="mb-3">
+                <button id="btn-get-location" class="btn btn-primary me-2">
+                  Obtener ubicación
+                </button>
+                <button id="btn-reset" class="btn btn-outline-secondary">
+                  Reiniciar
+                </button>
+              </div>
+              <div id="location-output" class="mb-3">
+                <div class="mb-2"><strong>Latitud:</strong> <span id="latitude">-</span></div>
+                <div><strong>Longitud:</strong> <span id="longitude">-</span></div>
+              </div>
+              <div id="message" class="alert d-none" role="alert"></div>
+
+              <!-- Botón avanzar al nivel 2 -->
+              <div id="btn-avanzar-n2-wrapper" class="d-none mt-3 text-end">
+                <button id="btn-avanzar-n2" class="btn btn-success">
+                  Avanzar al Nivel 2 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NIVEL 2 (oculto al inicio) -->
+        <div class="col-lg-8 d-none" id="seccion-nivel2">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-3">Nivel 2 - El cartógrafo perdido</h2>
+              <p>
+                Debes crear un mapa simplificado del área alrededor de tu ubicación actual. 
+                Dibuja el mapa usando formas geométricas y marca tu posición en el mismo.
+              </p>
+
+              <!-- Canvas -->
+              <div class="mb-3">
+                <div class="card p-3 bg-light">
+                  <canvas id="cartography-canvas" width="520" height="300"></canvas>
+                </div>
+              </div>
+
+              <!-- Coordenadas -->
+              <div class="mb-3 p-3 rounded" style="background:#f0f4ff; border-left:4px solid #3b82f6;">
+                <strong>Tu Ubicación (Nivel 1):</strong><br>
+                Latitud: <span id="map-lat" style="color:#2563eb;">-</span><br>
+                Longitud: <span id="map-lng" style="color:#2563eb;">-</span>
+              </div>
+
+              <!-- Instrucciones -->
+              <div class="mb-3 p-3 rounded" style="background:#fef9c3; border-left:4px solid #f59e0b;">
+                <strong style="color:#92400e;">Instrucciones de Dibujo:</strong>
+                <p class="mb-1 mt-1" style="color:#78350f;">El mapa debe contener:</p>
+                <ul style="color:#92400e; margin-bottom:0;">
+                  <li>Un rectángulo (área delimitada)</li>
+                  <li>Líneas (calles)</li>
+                  <li>Un círculo (tu ubicación actual)</li>
+                </ul>
+              </div>
+
+              <!-- Botones canvas -->
+              <div class="d-flex gap-2 mb-3">
+                <button id="btn-draw-map" class="btn btn-primary">
+                  Dibujar Mapa Automático
+                </button>
+                <button id="btn-clear-map" class="btn" style="background:#f59e0b; color:#fff; border:none;">
+                  Limpiar Lienzo
+                </button>
+              </div>
+
+              <div id="level2-map-message"></div>
+
+              <!-- Botón avanzar al nivel 3 -->
+              <div id="btn-avanzar-n3-wrapper" class="d-none mt-3 text-end">
+                <button id="btn-avanzar-n3" class="btn btn-success">
+                  Avanzar al Nivel 3 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NIVEL 3 (oculto al inicio) -->
+        <div class="col-lg-8 d-none" id="seccion-nivel3">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h2 class="h5 mb-3">Nivel 3 - Captura de evidencia</h2>
+              <p>
+                Para confirmar tu paso por la cámara de vigilancia, debes tomar una fotografía en vivo utilizando la cámara de tu dispositivo.
+              </p>
+
+              <div class="row gy-3">
+                <div class="col-md-6">
+                  <div class="ratio ratio-4x3 rounded overflow-hidden border border-secondary">
+                    <video id="video-stream" autoplay playsinline muted></video>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div id="photo-placeholder" class="rounded bg-light d-flex align-items-center justify-content-center" style="height:100%; min-height:240px; border:1px dashed #ced4da;">
+                    <span class="text-muted">Aquí aparecerá la foto capturada</span>
+                  </div>
+                  <img id="photo-preview" class="img-fluid rounded d-none mt-3" alt="Foto capturada" />
+                </div>
+              </div>
+
+              <div class="mt-3 d-flex flex-wrap gap-2">
+                <button id="btn-start-camera" class="btn btn-primary">Iniciar cámara</button>
+                <button id="btn-capture-photo" class="btn btn-success" disabled>Capturar foto</button>
+              </div>
+
+              <div id="camera-error" class="alert alert-danger d-none mt-3" role="alert"></div>
+
+              <canvas id="photo-canvas" class="d-none"></canvas>
+
+              <div id="btn-avanzar-n4-wrapper" class="d-none mt-3 text-end">
+                <button id="btn-avanzar-n4" class="btn btn-success">
+                  Avanzar al Nivel 4 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="app.js"></script>
+  </body>
+</html>
