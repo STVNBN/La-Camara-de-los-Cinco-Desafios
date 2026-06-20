@@ -5,13 +5,13 @@ self.onmessage = function(e) {
   const batchSize = 10000;
   let currentIndex = 0;
 
-  // Accumulated results for valid records
+  // Resultados acumulados para los registros válidos
   let validCount = 0;
   let sumTemp = 0;
   let sumHum = 0;
   let sumPres = 0;
 
-  // Helper arrays for top 10 (sorted descending, max length 10)
+  // Matrices auxiliares para los 10 primeros
   const topTemps = [];
   const topPressures = [];
 
@@ -34,7 +34,7 @@ self.onmessage = function(e) {
       const h = record.humedad;
       const p = record.presion;
 
-      // Filter negative values: a record is valid only if all fields are non-negative
+      // Filtrar valores negativos: un registro solo es válido si todos los campos son no negativos
       if (t >= 0 && h >= 0 && p >= 0) {
         validCount++;
         sumTemp += t;
@@ -51,19 +51,18 @@ self.onmessage = function(e) {
     self.postMessage({ tipo: 'progreso', porcentaje: porcentaje });
 
     if (currentIndex < total) {
-      // Yield execution to the browser's event loop to prevent blocking the worker's thread
-      // and allow the main thread to handle messages smoothly
+      // Ceder el control al bucle de eventos del navegador para evitar bloquear el hilo del worker
+      // y permitir que el hilo principal gestione los mensajes sin problemas
       setTimeout(processNextBatch, 10);
     } else {
-      // Calculate averages
+      // Calcula medidas
       const avgTemp = validCount > 0 ? (sumTemp / validCount) : 0;
       const avgHum = validCount > 0 ? (sumHum / validCount) : 0;
       const avgPres = validCount > 0 ? (sumPres / validCount) : 0;
 
-      // Filter valid records for export
       const validRecords = datos.filter(d => d.temperatura >= 0 && d.humedad >= 0 && d.presion >= 0);
 
-      // Stringify JSON in the worker thread to prevent freezing the main UI thread during download generation
+
       const resultadoJson = JSON.stringify({
         titulo: "Resultados - Nivel 5: El Portal Cuántico",
         fecha: new Date().toISOString(),
